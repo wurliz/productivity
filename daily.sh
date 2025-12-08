@@ -1,33 +1,30 @@
 #!/bin/bash
 
-# Move to script directory (the repo folder)
+# Go to script folder (repo)
 cd "$(dirname "$0")"
 
-# Get today's date
+# Today's date
 TODAY=$(date +%Y-%m-%d)
 
-# Make today's folder if it doesn't exist
+# Make today's folder
 mkdir -p "$TODAY"
 
-echo "Organising files into $TODAY..."
+echo "Organizing files into $TODAY..."
 
-# Loop through all items in the repo folder
+# Move all files/folders except .git, daily.sh, and date folders
+shopt -s dotglob nullglob
 for ITEM in *; do
-    # Skip the script itself, the .git folder, and existing date folders
-    if [[ "$ITEM" == "daily.sh" ]]; then continue; fi
-    if [[ "$ITEM" == ".git" ]]; then continue; fi
-    if [[ "$ITEM" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then continue; fi
-
-    # If it's a file or folder, move it into today's folder
+    if [[ "$ITEM" == ".git" ]] || [[ "$ITEM" == "daily.sh" ]] || [[ "$ITEM" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        continue
+    fi
     mv "$ITEM" "$TODAY"/
 done
 
 echo "Files moved. Committing..."
 
-# Git process
+# Git commands
 git add .
 git commit -m "Auto upload $TODAY"
 git push
 
 echo "Done! Uploaded to GitHub."
-
